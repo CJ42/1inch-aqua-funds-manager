@@ -4,7 +4,7 @@ import {
 	type CallInfo,
 	HexString,
 } from "@1inch/aqua-sdk";
-import { AquaXYCAmmStrategy, MakerTraits, Order } from "@1inch/swap-vm-sdk";
+import { AquaXYCAmmStrategy, MakerTraits, Order, instructions } from "@1inch/swap-vm-sdk";
 import {
 	type Address as EvmAddress,
 	encodeAbiParameters,
@@ -18,6 +18,7 @@ import { getTransactionCount, waitForTransactionReceipt } from "viem/actions";
 import { AQUA_CONTRACT, SWAP_VM_ROUTER } from "@/config";
 import type { PairAllocation } from "./portfolio";
 import { approveAquaToSpendTokens } from "./tokens";
+import { TOKENIZED_STOCKS, TOKENS } from "@/constants";
 
 export type LiquidityProvision = [
 	{
@@ -60,10 +61,55 @@ export async function buildAquaStrategy({
 	});
 	const salt = generateAquaStrategySalt({ liquidityProvision, makerNonce });
 
-	const program = AquaXYCAmmStrategy.new()
-		.withFeeTokenIn(30)
-		.withSalt(salt)
-		.build();
+	let program;
+
+	const { ONE_E18 } = instructions.concentrate
+
+	const token0 = liquidityProvision[0].token.toString();
+	const token1 = liquidityProvision[1].token.toString();
+
+	// For the USDG / WETH pair, for a price of 2,500$ / ETH 
+	// The price range `-5 % < ETH price < +5 %` corresponds to:
+	// 2,375$ < 2,500$ < 2,625$
+	if (token0 == TOKENS.USDG && token1 == TOKENS.WETH) {
+		program = AquaXYCAmmStrategy.newConcentrate({
+			rawPriceMin: ONE_E18 / 2375n,
+			rawPriceMax: ONE_E18 / 2625n,
+		})
+			.withFeeTokenIn(30)
+			.withSalt(salt)
+			.build();
+
+		// For the USDG / TSLA pair, for a stock price of 350$ / TSLA stock
+		// The price range `-5 % < TSLA stock price < +5 %` corresponds to:
+		// 332$ < 350$ < 367$
+	} else if (token0 == TOKENS.USDG && token1 == TOKENIZED_STOCKS.TSLA) {
+		program = AquaXYCAmmStrategy.newConcentrate({
+			rawPriceMin: ONE_E18 / 332n,
+			rawPriceMax: ONE_E18 / 367n,
+		})
+			.withFeeTokenIn(30)
+			.withSalt(salt)
+			.build();
+
+	// For the WETH / 1INCH pair,
+	// the price P = WETH per 1INCH. 
+	// 
+	// Considering a fixed price of 2,500$ per ETH
+	// 1 WETH = 2500 / 0.1 = 25,000 1INCH.
+	//
+	// If we apply ±5% to each token independently, ratios are:
+	// max: 2625 / 0.095 ≈ 27,632 1INCH per WETH
+	// min: 2375 / 0.105 ≈ 22,619 1INCH per WETH
+	} else {
+		program = AquaXYCAmmStrategy.newConcentrate({
+			rawPriceMin: ONE_E18 / 27632n,
+			rawPriceMax: ONE_E18 / 22619n
+		})
+			.withFeeTokenIn(30)
+			.withSalt(salt)
+			.build();
+	}
 
 	const order = Order.new({
 		maker: new Address(maker),
