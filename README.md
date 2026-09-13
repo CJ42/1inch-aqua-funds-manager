@@ -143,13 +143,10 @@ After connecting its wallet to the app and using the Robinhood anvil fork networ
 ## 💡 What I would have improved with more time?
 
 - I would have added the ability for the user to enter the amount they want to invest when picking a pre-built portfolio (so far, it is set to $1,000 for the demo).
-- I would have improved the configurations for liquidity provisions to use **Concentrated liquidity** on a price range `-5% < asset price < +5%`. So to reflect the rebalancing strategy.
+- I would have improved the configurations for liquidity provisions to use **Concentrated liquidity** on a price range `-5% < asset price < +5%`. So to reflect the rebalancing strategy (_Note: I implemented this in the codebase, but this was not deployed as part of the core logic on the live app, as I wasn't sure for the params to provide for `rawPriceMin` and `rawPriceMax`_).
 - I would have allowed the user to pick among different pools / pairs, or any other tokenized stock on Robinhood, such as Nvidia (`NVDA`), Apple (`AAPL`), or Microsoft (`AAPL`). This is what I had planned by listing all of these stocks inside [`src/constants.ts`](./src/constants.ts)
 - I would have investigated to implemented **Privy** for easier wallet connection and on-boarding, as well as how to implement portfolio and treasury management features that Privy offer.
-
-## 🏗️ What should be built in production
-
-- Liquidity rebalancing should be implemented automatically, with an off-chain oracle monitoring for the ETH, 1INCH token and TSLA stock price. For this demo, it is cut off for simplicity.
+- Liquidity rebalancing should be implemented automatically as well (not only manually), with an off-hain oracle monitoring for the ETH, 1INCH token and TSLA stock price. For this demo, it is cut off for simplicity.
 
 
 ## Getting Started + Pre-requisites
