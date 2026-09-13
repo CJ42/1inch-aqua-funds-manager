@@ -11,6 +11,7 @@ import {
 	formatUnits,
 	type Hex,
 	http,
+	parseUnits,
 } from "viem";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { robinhoodFork, SWAP_VM_ROUTER } from "@/config";
 import { useWallet } from "@/hooks/useWallet";
 import {
@@ -29,7 +31,6 @@ import {
 	type DecodedTakerSwap,
 	decodeQuoteResult,
 	decodeTakerSwapReceipt,
-	TAKER_SWAP_AMOUNT_IN,
 	TAKER_TOKEN_IN,
 	type TakerSwapQuote,
 } from "@/lib/swap";
@@ -60,6 +61,7 @@ export function TakerSwapPanel({
 	canSwap = true,
 }: TakerSwapPanelProps) {
 	const { address: taker, isConnecting, connect } = useWallet();
+	const [amountInStr, setAmountInStr] = useState("10");
 	const [quote, setQuote] = useState<TakerSwapQuote | null>(null);
 	const [result, setResult] = useState<SwapResultView | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -93,6 +95,19 @@ export function TakerSwapPanel({
 		}
 
 		setError(null);
+
+		let amountIn: bigint;
+		try {
+			amountIn = parseUnits(amountInStr, 6);
+		} catch {
+			setError("Enter a valid USDG amount");
+			return;
+		}
+		if (amountIn <= BigInt(0)) {
+			setError("Amount must be a positive number");
+			return;
+		}
+
 		setResult(null);
 		setBusyAction("swap");
 
@@ -110,8 +125,8 @@ export function TakerSwapPanel({
 				transport: http(robinhoodFork.rpcUrls.default.http[0]),
 			});
 
-			setStatus(`Quoting USDG → WETH against ${pairLabel}…`);
-			const quoteTx = buildTakerQuoteTx({ strategy });
+			setStatus(`Quoting ${amountInStr} USDG → WETH against ${pairLabel}…`);
+			const quoteTx = buildTakerQuoteTx({ strategy, amountIn });
 			const simulation = await publicClient.call({
 				account: taker,
 				to: quoteTx.to,
@@ -127,7 +142,7 @@ export function TakerSwapPanel({
 				address: TAKER_TOKEN_IN,
 				abi: erc20Abi,
 				functionName: "approve",
-				args: [SWAP_VM_ROUTER.toString() as Address, TAKER_SWAP_AMOUNT_IN],
+				args: [SWAP_VM_ROUTER.toString() as Address, amountIn],
 				account: taker,
 				chain: robinhoodFork,
 			});
@@ -136,6 +151,7 @@ export function TakerSwapPanel({
 			setStatus("Confirm the SwapVM swap in MetaMask…");
 			const swapTx = buildTakerSwapTx({
 				strategy,
+				amountIn,
 				minAmountOut: quoted.minAmountOut,
 			});
 			const swapHash = await walletClient.sendTransaction({
@@ -174,14 +190,25 @@ export function TakerSwapPanel({
 				<CardTitle>Swap {pairLabel}</CardTitle>
 				<CardDescription>
 					{canSwap
-						? "Claim test funds on Home, then swap 10 USDG → WETH."
+						? `Claim test funds on Home, then swap ${amountInStr || "…"} USDG → WETH.`
 						: "This route is listed from the shipped SwapVM strategy. Live swap is only wired for USDG / WETH right now."}
 				</CardDescription>
 			</CardHeader>
 			<CardContent className={styles.content}>
-				<p>
-					Amount in: <strong>10 USDG</strong>
-				</p>
+				<div className={styles.amountField}>
+					<label className={styles.amountLabel} htmlFor="taker-amount-in">
+						Amount in (USDG)
+					</label>
+					<Input
+						id="taker-amount-in"
+						type="number"
+						min={0}
+						step="any"
+						value={amountInStr}
+						disabled={isBusy || !canSwap}
+						onChange={(event) => setAmountInStr(event.target.value)}
+					/>
+				</div>
 				{strategyHash ? (
 					<p>
 						Strategy hash{" "}
@@ -263,7 +290,9 @@ export function TakerSwapPanel({
 						disabled={isBusy || !taker || !canSwap}
 						onClick={handleSwap}
 					>
-						{busyAction === "swap" ? "Swapping…" : "Swap 10 USDG → WETH"}
+						{busyAction === "swap"
+							? "Swapping…"
+							: `Swap ${amountInStr || "…"} USDG → WETH`}
 					</Button>
 				</div>
 			</CardFooter>
