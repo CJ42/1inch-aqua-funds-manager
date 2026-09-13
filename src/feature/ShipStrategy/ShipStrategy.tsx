@@ -3,9 +3,10 @@
 import { useState } from "react";
 import type { Address } from "viem";
 import { StrategyCards } from "@/components/StrategyCard";
+import { Input } from "@/components/ui/input";
 import { useWallet } from "@/hooks/useWallet";
 import type { RiskProfile } from "@/lib/portfolio";
-import type { ShipPortfolioResult } from "@/lib/ship";
+import { FIXED_SHIP_TOTAL_USD, type ShipPortfolioResult } from "@/lib/ship";
 import { saveShippedPortfolio } from "@/lib/ship-store";
 import { formatWalletError, getEthereumProvider } from "@/lib/wallet";
 import { shipPortfolio } from "./api";
@@ -18,14 +19,19 @@ export function ShipStrategy() {
 	const [selectedProfile, setSelectedProfile] = useState<RiskProfile | null>(
 		null,
 	);
+	const [investAmountUsd, setInvestAmountUsd] = useState(FIXED_SHIP_TOTAL_USD);
 	const [error, setError] = useState<string | null>(null);
 	const [step, setStep] = useState<string | null>(null);
 	const [result, setResult] = useState<ShipPortfolioResult | null>(null);
 	const [isResultOpen, setIsResultOpen] = useState(false);
 	const [isShipping, setIsShipping] = useState(false);
 
+	const isAmountValid =
+		Number.isFinite(investAmountUsd) && investAmountUsd >= 10;
+
 	async function handleShip() {
-		if (!selectedProfile || isShipping || isConnecting) return;
+		if (!selectedProfile || !isAmountValid || isShipping || isConnecting)
+			return;
 
 		setError(null);
 		setIsShipping(true);
@@ -42,7 +48,12 @@ export function ShipStrategy() {
 			const account = accounts[0] as Address | undefined;
 			if (!account) throw new Error("Connect a wallet first");
 
-			const shipped = await shipPortfolio(selectedProfile, account, setStep);
+			const shipped = await shipPortfolio(
+				selectedProfile,
+				account,
+				investAmountUsd,
+				setStep,
+			);
 			saveShippedPortfolio(shipped);
 			setResult(shipped);
 			setIsResultOpen(true);
@@ -56,6 +67,23 @@ export function ShipStrategy() {
 
 	return (
 		<div className={styles.root}>
+			<div className={styles.amountSection}>
+				<label className={styles.amountLabel} htmlFor="invest-amount-usd">
+					Investment amount (USD)
+				</label>
+				<Input
+					id="invest-amount-usd"
+					type="number"
+					min={10}
+					step={10}
+					value={Number.isFinite(investAmountUsd) ? investAmountUsd : ""}
+					disabled={isShipping}
+					onChange={(event) =>
+						setInvestAmountUsd(event.target.valueAsNumber)
+					}
+				/>
+			</div>
+
 			<StrategyCards
 				selectedProfile={selectedProfile}
 				onSelect={setSelectedProfile}
@@ -66,6 +94,7 @@ export function ShipStrategy() {
 				<div className={styles.confirmSection}>
 					<ShipConfirmPanel
 						profile={selectedProfile}
+						amountUsd={investAmountUsd}
 						isShipping={isShipping}
 						step={step}
 						error={error}

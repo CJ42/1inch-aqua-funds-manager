@@ -17,7 +17,6 @@ import {
 } from "@/lib/portfolio";
 import {
 	decodeAquaShipEvents,
-	FIXED_SHIP_TOTAL_USD,
 	type ShipPortfolioResult,
 	type ShippedSleeveResult,
 	strategyHashFromEvents,
@@ -31,6 +30,7 @@ import {
 export async function shipPortfolio(
 	profile: RiskProfile,
 	address: Address,
+	totalUsd: number,
 	onStep?: (message: string) => void,
 ): Promise<ShipPortfolioResult> {
 	const provider = getEthereumProvider();
@@ -44,7 +44,7 @@ export async function shipPortfolio(
 	}).extend(publicActions);
 
 	const { allocations } = buildPortfolioAllocations({
-		totalUsd: FIXED_SHIP_TOTAL_USD,
+		totalUsd,
 		weights: PROFILE_WEIGHTS[profile],
 		prices: FIXED_TOKEN_PRICES_USD,
 	});
@@ -73,7 +73,7 @@ export async function shipPortfolio(
 	return {
 		maker: address,
 		profile,
-		totalUsd: FIXED_SHIP_TOTAL_USD,
+		totalUsd,
 		approvalHashes,
 		sleeves,
 	};

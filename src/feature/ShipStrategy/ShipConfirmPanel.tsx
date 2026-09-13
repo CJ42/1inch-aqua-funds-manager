@@ -11,11 +11,11 @@ import {
 } from "@/components/ui/card";
 import type { RiskProfile } from "@/lib/portfolio";
 import { PROFILE_WEIGHTS } from "@/lib/portfolio";
-import { FIXED_SHIP_TOTAL_USD } from "@/lib/ship";
 import styles from "./ShipStrategy.module.css";
 
 type ShipConfirmPanelProps = {
 	profile: RiskProfile;
+	amountUsd: number;
 	isShipping: boolean;
 	step: string | null;
 	error: string | null;
@@ -30,12 +30,14 @@ const liquidityPairs = [
 
 export function ShipConfirmPanel({
 	profile,
+	amountUsd,
 	isShipping,
 	step,
 	error,
 	onShip,
 }: ShipConfirmPanelProps) {
 	const weights = PROFILE_WEIGHTS[profile];
+	const isAmountValid = Number.isFinite(amountUsd) && amountUsd >= 10;
 
 	return (
 		<Card className={styles.confirmCard}>
@@ -43,7 +45,7 @@ export function ShipConfirmPanel({
 				<CardTitle className="text-2xl">Portfolio Overview</CardTitle>
 				<CardTitle>Confirm funds allocation</CardTitle>
 				<CardDescription>
-					Ship a fixed ${FIXED_SHIP_TOTAL_USD.toLocaleString()} allocation
+					Ship a ${isAmountValid ? amountUsd.toLocaleString() : "—"} allocation
 					across three Aqua strategies. Confirm each approval and ship in your
 					connected wallet.
 				</CardDescription>
@@ -60,13 +62,13 @@ export function ShipConfirmPanel({
 					<tbody>
 						{liquidityPairs.map((pair) => {
 							const percent = Math.round(weights[pair.sleeve] * 100);
-							const usdValue = FIXED_SHIP_TOTAL_USD * weights[pair.sleeve];
+							const usdValue = amountUsd * weights[pair.sleeve];
 
 							return (
 								<tr key={pair.sleeve}>
 									<td>{pair.label}</td>
 									<td>{percent}%</td>
-									<td>${usdValue.toFixed(0)}</td>
+									<td>{Number.isFinite(usdValue) ? `$${usdValue.toFixed(0)}` : "—"}</td>
 								</tr>
 							);
 						})}
@@ -90,7 +92,7 @@ export function ShipConfirmPanel({
 					type="button"
 					size="lg"
 					className={styles.shipButton}
-					disabled={isShipping}
+					disabled={isShipping || !isAmountValid}
 					onClick={onShip}
 				>
 					{isShipping ? "Deploying…" : "Deploy strategies"}
