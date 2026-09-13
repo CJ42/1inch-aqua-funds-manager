@@ -10,6 +10,7 @@ import {
 	http,
 } from "viem"
 import { strategyById } from "@/components/StrategyCard"
+import { TokenIcon, TokenPair } from "@/components/TokenIcon"
 import { Button } from "@/components/ui/button"
 import {
 	Card,
@@ -292,7 +293,10 @@ export function InvestorDashboard() {
 									key={token.symbol}
 									className={`${styles.priceItem} ${isDrifted ? styles.priceItemDrifted : ""}`}
 								>
-									<span className={styles.priceSymbol}>{token.symbol}</span>
+									<span className={styles.priceSymbol}>
+										<TokenIcon symbol={token.symbol} size={16} />
+										{token.symbol}
+									</span>
 									<span className={styles.priceValue}>${price.toLocaleString()}</span>
 									{isDrifted ? (
 										<span className={styles.priceTag}>+250% pump ($350 → $1,225)</span>
@@ -337,7 +341,12 @@ export function InvestorDashboard() {
 						<Card key={allocation.sleeve} className={styles.position}>
 							<CardHeader>
 								<div className={styles.positionHeader}>
-									<CardTitle>{SLEEVE_LABELS[allocation.sleeve]}</CardTitle>
+									<CardTitle>
+										<TokenPair
+											pair={SLEEVE_LABELS[allocation.sleeve]}
+											size={18}
+										/>
+									</CardTitle>
 									<span className={`${styles.badge} ${badgeClass}`}>
 										{badgeText}
 									</span>
@@ -482,7 +491,10 @@ export function InvestorDashboard() {
 								return (
 									<tr key={token.symbol}>
 										<td>
-											<strong>{token.symbol}</strong> ({token.name})
+											<span className={styles.tokenCell}>
+												<TokenIcon symbol={token.symbol} size={18} />
+												<strong>{token.symbol}</strong> ({token.name})
+											</span>
 										</td>
 										<td>{formatAmount(needed, sym)}</td>
 										<td>{address ? formatAmount(inWallet, sym) : "—"}</td>

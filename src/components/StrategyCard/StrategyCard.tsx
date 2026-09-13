@@ -9,6 +9,7 @@ import {
 } from "chart.js";
 import { Check } from "lucide-react";
 import { Pie } from "react-chartjs-2";
+import { TokenPair } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -138,7 +139,9 @@ export function StrategyCard({
 					<tbody>
 						{liquidityPairs.map((pair, index) => (
 							<tr key={pair}>
-								<td>{pair}</td>
+								<td>
+									<TokenPair pair={pair} size={18} />
+								</td>
 								<td>{allocations[index]}%</td>
 							</tr>
 						))}

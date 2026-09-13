@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TokenIcon } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import { TOKENIZED_STOCKS, TOKENS } from "@/constants";
 import { getTokenDecimals } from "@/lib/tokens";
@@ -67,6 +68,7 @@ export function ImportTokens({ align = "start" }: ImportTokensProps) {
 						title={`Import ${token.symbol} to your wallet`}
 						onClick={() => importToken(token.symbol, token.address)}
 					>
+						<TokenIcon symbol={token.symbol} size={16} />
 						{busy === token.symbol ? "…" : token.symbol}
 					</Button>
 				))}

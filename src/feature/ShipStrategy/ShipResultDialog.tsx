@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { strategyById } from "@/components/StrategyCard";
+import { TokenPair } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -51,7 +52,9 @@ export function ShipResultDialog({
 					{result.sleeves.map((sleeve) => (
 						<article key={sleeve.txHash} className={styles.resultSleeve}>
 							<header>
-								<h3>{sleeveLabels[sleeve.sleeve]}</h3>
+								<h3>
+									<TokenPair pair={sleeveLabels[sleeve.sleeve]} size={18} />
+								</h3>
 								<p>
 									Tx{" "}
 									<code title={sleeve.txHash}>

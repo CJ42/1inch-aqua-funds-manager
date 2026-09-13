@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { TokenPair } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -98,7 +99,9 @@ function SwapRouteButton({
 			className={`${styles.route} ${isSelected ? styles.selected : ""}`}
 			onClick={() => onSelect(sleeve.sleeve)}
 		>
-			<span className={styles.routePair}>{SLEEVE_LABELS[sleeve.sleeve]}</span>
+			<span className={styles.routePair}>
+				<TokenPair pair={SLEEVE_LABELS[sleeve.sleeve]} size={20} />
+			</span>
 			<span className={styles.routeMeta}>
 				{canSwap ? "Ready to swap" : "Quote only for now"}
 			</span>

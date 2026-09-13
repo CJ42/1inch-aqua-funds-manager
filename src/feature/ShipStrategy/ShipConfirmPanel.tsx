@@ -1,5 +1,6 @@
 "use client";
 
+import { TokenPair } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -66,7 +67,9 @@ export function ShipConfirmPanel({
 
 							return (
 								<tr key={pair.sleeve}>
-									<td>{pair.label}</td>
+									<td>
+										<TokenPair pair={pair.label} size={18} />
+									</td>
 									<td>{percent}%</td>
 									<td>{Number.isFinite(usdValue) ? `$${usdValue.toFixed(0)}` : "—"}</td>
 								</tr>

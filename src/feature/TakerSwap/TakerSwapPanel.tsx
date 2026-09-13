@@ -13,6 +13,7 @@ import {
 	http,
 	parseUnits,
 } from "viem";
+import { TokenPair } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -187,7 +188,9 @@ export function TakerSwapPanel({
 	return (
 		<Card className={styles.card}>
 			<CardHeader>
-				<CardTitle>Swap {pairLabel}</CardTitle>
+				<CardTitle className={styles.cardTitle}>
+					Swap <TokenPair pair={pairLabel} size={20} />
+				</CardTitle>
 				<CardDescription>
 					{canSwap
 						? `Claim test funds on Home, then swap ${amountInStr || "…"} USDG → WETH.`

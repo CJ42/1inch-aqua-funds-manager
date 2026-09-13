@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { AddRobinhoodNetworkButton } from "@/components/ForkWalletActions";
+import robinhoodBanner from "@/img/robinhood.png";
 import styles from "./LocalForkNotice.module.css";
 
 const SNAPSHOT_URL =
@@ -21,6 +23,12 @@ export function LocalForkNotice() {
 
 	return (
 		<aside className={styles.notice} aria-labelledby="local-fork-title">
+			<Image
+				src={robinhoodBanner}
+				alt="Robinhood chain"
+				className={styles.banner}
+				priority
+			/>
 			<h2 id="local-fork-title" className={styles.title}>
 				Step 1 - Run a local Robinhood fork
 			</h2>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Address } from "viem";
 import { ImportTokens } from "@/components/ForkWalletActions";
+import { TokenIcon } from "@/components/TokenIcon";
 import { Button } from "@/components/ui/button";
 import { FAUCET_DROPS } from "@/config";
 import { fundTaker } from "@/feature/TakerSwap/api";
@@ -62,7 +63,8 @@ export function ClaimTestFunds() {
 			</p>
 			<ul className={styles.list}>
 				{FAUCET_DROPS.map((drop) => (
-					<li key={drop.symbol}>
+					<li key={drop.symbol} className={styles.listItem}>
+						<TokenIcon symbol={drop.symbol} size={18} />
 						{drop.amount} {drop.symbol}
 					</li>
 				))}

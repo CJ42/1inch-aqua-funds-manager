@@ -23,12 +23,21 @@
 }
 
 .list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
 	margin: 0.75rem 0 1rem;
-	padding-left: 1.25rem;
+	padding: 0;
 	color: #101828;
 	font-size: 0.95rem;
 	line-height: 1.7;
-	list-style: disc;
+	list-style: none;
+}
+
+.listItem {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .button {

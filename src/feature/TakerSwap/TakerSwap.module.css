@@ -16,6 +16,12 @@
 	color: #101828;
 }
 
+.cardTitle {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
 .amountField {
 	display: flex;
 	flex-direction: column;

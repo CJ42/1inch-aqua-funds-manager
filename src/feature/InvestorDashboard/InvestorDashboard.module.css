@@ -138,6 +138,9 @@
 }
 
 .priceSymbol {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
 	font-size: 0.75rem;
 	font-weight: 600;
 	text-transform: uppercase;
@@ -321,6 +324,12 @@
 	letter-spacing: 0.05em;
 	color: #64748b;
 	border-bottom: 1px solid rgb(16 24 40 / 8%);
+}
+
+.tokenCell {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
 }
 
 .coverageTable td {
