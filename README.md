@@ -5,6 +5,8 @@
 
 ![Cover image](./cover-image.png)
 
+> **Note for testing:** since this demo app requires to use a local anvil fork to run on `http://localhost:8545`, the live demo url might not work unfortunately when using a wallet, as modern browsers restrict public websites from making requests to localhost. The full e2e testing with a wallet, follow the section below on **LOcal Development** to clone the repository and run the UI locally.
+
 ## Project Overview
 
 💧 Aqua Funds Manager is an app allowing liquidity providers on  on **Robinhood** 🪶 to allocate their liquidity differently across AMM pools depending on their risk tolerance and the risk profile they selected.
